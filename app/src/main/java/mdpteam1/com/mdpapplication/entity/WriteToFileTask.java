@@ -36,7 +36,8 @@ public class WriteToFileTask extends AsyncTask<String,Void,Void> {
         ed.putString("MDF_Part1",mdf_part1.toString());
         ed.putString("MDF_Part2", mdf_part2.toString());
         ed.commit();
-        mainController.getMDF(mdf_part1.toString(),mdf_part2.toString());
+        mainController.setMDF(mdf_part1.toString(),mdf_part2.toString());
+        mainController.writeToSDFile(mdf_part1.toString(),mdf_part2.toString());
         return null;
     }
     @Override

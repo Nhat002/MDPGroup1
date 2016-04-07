@@ -48,6 +48,7 @@ public class MainController {
     private String robotMode = ControlFragment.EXPLORATION_PHASE;
     private boolean robotFinishRunning = true;
     private String[][] mapExplored = new String[NUM_ROWS][NUM_COLUMNS];
+    private int numOfObstacles = 0;
     public int passX = -1;
     public int passY = -1;
     public static String mdf1 = "";
@@ -96,7 +97,7 @@ public class MainController {
         robotArea = new int[]{coordX + 1, coordX-1, coordY + 1, coordY -1};
     }
 
-    public void getMDF(String s, String s1) {
+    public void setMDF(String s, String s1) {
         this.mdf1 = "mdf part1 : " +s;
         this.mdf2 = "mdf part 2: " + s1;
     }
@@ -447,15 +448,38 @@ public class MainController {
                             StringBuilder str_1 = new StringBuilder();
                             str_1.append("11");
                             StringBuilder str_2 = new StringBuilder();
+                            int numOfUnexplored = 0;
+                            boolean isSetUnexploredAsFree = true;
                             for (int i = 0; i < NUM_ROWS; ++i) {
                                 for (int j = 0; j < NUM_COLUMNS; ++j) {
-                                    if (mapData[NUM_ROWS - i - 1][j].equals(GridCellAdapter.UNEXPLORED)){
-                                        mapData[NUM_ROWS - i - 1][j]  = GridCellAdapter.FREESPACE;
-                                    }
                                     if (mapData[NUM_ROWS - i - 1][j].equals(GridCellAdapter.UNEXPLORED)) {
-                                        str_1.append("0");
+                                        numOfUnexplored++;
+                                    }
+                                }
+                            }
+                            if(numOfObstacles < 30){
+                                if(numOfUnexplored == 30-numOfObstacles){
+                                    isSetUnexploredAsFree = false;
+                                }
+                                else{
+                                    isSetUnexploredAsFree = true;
+                                }
+                            }
+                            else{
+                                isSetUnexploredAsFree = true;
+                            }
+                            for (int i = 0; i < NUM_ROWS; ++i) {
+                                for (int j = 0; j < NUM_COLUMNS; ++j) {
+                                    str_1.append("1");
+                                    if (mapData[NUM_ROWS - i - 1][j].equals(GridCellAdapter.UNEXPLORED)) {
+                                        if(isSetUnexploredAsFree){
+                                            mapData[NUM_ROWS - i - 1][j] = GridCellAdapter.FREESPACE;
+                                        }
+                                        else{
+                                            mapData[NUM_ROWS - i - 1][j] = GridCellAdapter.OBSTACLE;
+                                        }
                                     } else {
-                                        str_1.append("1");
+
                                         if (mapData[NUM_ROWS - i - 1][j].equals(GridCellAdapter.OBSTACLE)) {
                                             str_2.append("1");
                                         } else {
@@ -542,7 +566,6 @@ public class MainController {
                            while (str_2.length() % 8 != 0) {
                                str_2.append("0");
                            }
-                           writeToSDFile(mdf1,mdf2);
                            new WriteToFileTask().execute(str_1.toString(), str_2.toString());
                        }
                    }, 2000);
@@ -842,6 +865,9 @@ public class MainController {
                 continue;
             }
             mapData[y][x] = gData[i+2];
+            if(gData[i+2].equals(GridCellAdapter.OBSTACLE)){
+                numOfObstacles++;
+            }
             explored[y][x] = true;
 
         }
@@ -866,7 +892,7 @@ public class MainController {
         return false;
     }
 
-    private void writeToSDFile(String mdf1, String mdf2){
+    public void writeToSDFile(String mdf1, String mdf2){
 
         // Find the root of the external storage.
         // See http://developer.android.com/guide/topics/data/data-  storage.html#filesExternal
