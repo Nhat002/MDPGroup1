@@ -478,13 +478,12 @@ public class MainController {
                                         else{
                                             mapData[NUM_ROWS - i - 1][j] = GridCellAdapter.OBSTACLE;
                                         }
-                                    } else {
+                                    }
 
-                                        if (mapData[NUM_ROWS - i - 1][j].equals(GridCellAdapter.OBSTACLE)) {
-                                            str_2.append("1");
-                                        } else {
-                                            str_2.append("0");
-                                        }
+                                    if (mapData[NUM_ROWS - i - 1][j].equals(GridCellAdapter.OBSTACLE)) {
+                                        str_2.append("1");
+                                    } else {
+                                        str_2.append("0");
                                     }
                                 }
                             }
